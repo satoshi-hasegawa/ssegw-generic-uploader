@@ -58,51 +58,60 @@ Uploader::upload()
 {
   sse_int err;
   sse_int id;
-  MoatObject* messages;
   MoatObject* collection;
   MoatObjectIterator* it;
   sse_char* json;
   sse_uint json_len;
 
-  queue_->peekMessage(max_uploading_messages_, &messages);
-  uploading_ = messages;
+  err = queue_->peekMessage(max_uploading_messages_, &uploading_);
+  ASSERT(err == SSE_E_OK);
   MOAT_OBJECT_DUMP_DEBUG(TAG, uploading_);
 
   collection = moat_object_new();
   ASSERT(collection);
 
-  it = moat_object_create_iterator(messages);
+  it = moat_object_create_iterator(uploading_);
   ASSERT(it);
   while (moat_object_iterator_has_next(it)) {
     sse_char* key;
-    MoatObject* tmp;
-    MoatObject* tmp2;
+    MoatObject* ref;
+    MoatObject* model_object;
 
     key = moat_object_iterator_get_next_key(it);
     ASSERT(key);
 
-    err = moat_object_get_object_value(messages, key, &tmp);
+    err = moat_object_get_object_value(uploading_, key, &ref);
     ASSERT(err == SSE_E_OK);
 
-    tmp2 = moat_object_new(); // No need to free
-    ASSERT(tmp2);
-    err = moat_object_to_json_string(tmp, NULL, &json_len);
+    err = moat_object_to_json_string(ref, NULL, &json_len);
     ASSERT(err == SSE_E_OK);
     json = (sse_char*)sse_malloc(json_len);
     ASSERT(json);
-    err = moat_object_to_json_string(tmp, json, &json_len);
+    err = moat_object_to_json_string(ref, json, &json_len);
     ASSERT(err == SSE_E_OK);
 
-    err = moat_object_add_string_value(tmp2, const_cast<sse_char*>("value"), json, json_len, sse_false, sse_false);
+    model_object = moat_object_new();
+    ASSERT(model_object);
+    err = moat_object_add_string_value(model_object,
+                                       const_cast<sse_char*>("value"),
+                                       json, json_len,
+                                       // Might be bug in case of using moat_object_add_string_value()
+                                       // with in_dup = sse_true and string is not NULL terminated.
+                                       //sse_false, // No need to free json
+                                       sse_true,
+                                       sse_false);
     ASSERT(err == SSE_E_OK);
+    sse_free(json);
     
-    err = moat_object_add_object_value(collection, key, tmp2, sse_true, sse_false);
-    if (err != SSE_E_OK) {
-      LOG_ERROR("moat_object_add_object_value() failed with [%s].", sse_get_error_string(err));
-      ASSERT(err == SSE_E_OK);
-    }
+    err = moat_object_add_object_value(collection,
+                                       key,
+                                       model_object,
+                                       sse_false, // No need to free model_object
+                                       sse_false);
+    ASSERT(err == SSE_E_OK);
   }
-
+  moat_object_iterator_free(it);
+  
   sse_char* urn = moat_create_notification_id_with_moat(moat_,
                                                         const_cast<sse_char*>("sensor-uploader"),
                                                         const_cast<sse_char*>("1.0.0"));
