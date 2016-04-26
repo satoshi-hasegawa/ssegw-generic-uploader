@@ -37,10 +37,12 @@ on_recv_data(MoatIOWatcher *in_watcher,
              sse_int in_desc,
              sse_int in_event_flags)
 {
+  sse_int err;
   struct sockaddr_in si;
   socklen_t si_len = sizeof(si);
   sse_char buf[ExternalProcessSensor::RECV_BUFF_SIZE];
   sse_int recv_len;
+  MoatObject* obj;
 
   sse_memset(buf, 0, sizeof(buf));
   recv_len = recvfrom(in_desc, buf, sizeof(buf) -1, 0, (struct sockaddr *)&si, &si_len);
@@ -49,7 +51,14 @@ on_recv_data(MoatIOWatcher *in_watcher,
     return;
   }
   LOG_INFO("Received packet from %s:%d", inet_ntoa(si.sin_addr), ntohs(si.sin_port));
-  LOG_INFO("Message = [%s].", buf);
+
+  err = moat_json_string_to_moat_object(buf, sse_strlen(buf), &obj, NULL);
+  if (err != SSE_E_OK) {
+    LOG_ERROR("moat_json_string_to_moat_object() failed with [%s].", sse_get_error_string(err));
+    return;
+  }
+  MOAT_OBJECT_DUMP_INFO(TAG, obj);
+
   return;
 }
 
