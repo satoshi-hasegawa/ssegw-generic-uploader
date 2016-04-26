@@ -1,0 +1,27 @@
+{
+  "name" : "sensor-uploader",
+  "version" : "1.0.0",
+  "description" : "[description]",
+  "maintainers" : [
+    {
+      "name" : "[name]",
+      "email" : "[email]"
+    }
+  ],
+  "bugs" : {
+    "mail" : "[email]"
+  },
+  "dependencies" : {
+    "moat" : ">=1.0.0 <2.0.0"
+  },
+  "main" : "sensor-uploader.so",
+  "models" : {
+    "SensedData" : {
+      "array" : true,
+      "scope" : "device",
+      "attributes" : {
+        "timestamp" : {"type" : "int64"}
+      }
+    }
+  }
+}

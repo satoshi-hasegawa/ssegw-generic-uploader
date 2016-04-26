@@ -1,4 +1,11 @@
 .vscode
+certs
+out
+config.gypi
+config.mk
+*~
+package/token.bin
+test
 
 # Compiled Object files
 *.slo
@@ -23,8 +30,10 @@
 *.la
 *.a
 *.lib
+*.pyc
 
 # Executables
 *.exe
 *.out
 *.app
+
