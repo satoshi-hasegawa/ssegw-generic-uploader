@@ -27,6 +27,8 @@
 #define SSE_END_C_DECLS
 #endif /* __cplusplus */
 
+SSE_BEGIN_C_DECLS
+
 typedef sse_int32 sse_result;
 
 #define sse_false			(0)
@@ -128,5 +130,7 @@ enum event_boundary_ {
 	SSE_USER_EVENT_MIN_ID = 1001,
 	SSE_EVENT_BOUNDARYs
 };
+
+SSE_END_C_DECLS
 
 #endif /* SSEBASE_H__ */
