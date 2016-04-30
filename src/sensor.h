@@ -24,6 +24,7 @@ class SensorListener;
 class Sensor {
  public:
   Sensor();
+  Sensor(MoatObject &config) {}
   virtual ~Sensor();
   virtual sse_int addListener(SensorListener* in_listener);
   virtual sse_int removeListener(SensorListener* in_listener);

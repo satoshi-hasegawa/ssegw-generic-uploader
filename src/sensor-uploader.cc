@@ -23,11 +23,33 @@ moat_app_main(sse_int in_argc, sse_char *argv[])
   Moat moat = NULL;
   sse_int err = SSE_E_OK;
   ModelMapper mapper;
+  MoatObject* config;
+  MoatObject* config_sensor;
+  const sse_char* config_file_path = "config.json";
 
   err = moat_init(argv[0], &moat);
   if (err != SSE_E_OK) {
     goto error_exit;
   }
+
+  /* Load configurations */
+  err = moat_json_file_to_moat_object(const_cast<sse_char*>(config_file_path),
+                                      &config,
+                                      NULL);
+  if (err != SSE_E_OK) {
+    LOG_ERROR("Configuration file, %s was not found.", config_file_path);
+    goto error_exit;
+  }
+  MOAT_OBJECT_DUMP_DEBUG(TAG, config);
+
+  err = moat_object_get_object_value(config,
+                                     const_cast<sse_char*>("dummy_sensor"),
+                                     &config_sensor);
+  if (err != SSE_E_OK) {
+    LOG_ERROR("Configuration for dummy_sonsor was not found.");
+    goto error_exit;
+  }
+
 
   /* setup event handlers, timers, etc */
   /* register models */
@@ -45,7 +67,7 @@ moat_app_main(sse_int in_argc, sse_char *argv[])
   }
 
   {
-    ExternalProcessSensor sensor;
+    ExternalProcessSensor sensor(*config_sensor);
 
     err = moat_run(moat);
     if (err != SSE_E_OK) {

@@ -5,7 +5,7 @@
 
 class ExternalProcessSensor {
  public:
-  ExternalProcessSensor(sse_int in_port = DEFAULT_PORT_NO);
+  ExternalProcessSensor(MoatObject &config);
   virtual ~ExternalProcessSensor();
 
  private:

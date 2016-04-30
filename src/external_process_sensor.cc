@@ -62,14 +62,21 @@ on_recv_data(MoatIOWatcher *in_watcher,
   return;
 }
 
-ExternalProcessSensor::ExternalProcessSensor(sse_int in_port) : watcher_(NULL),
-                                                                sock_(-1),
-                                                                port_(in_port)
-
+ExternalProcessSensor::ExternalProcessSensor(MoatObject &config) : watcher_(NULL),
+                                                                   sock_(-1),
+                                                                   port_(DEFAULT_PORT_NO)
 {
   sse_int ret;
   struct sockaddr_in si;
+  sse_int64 port;
 
+  // Load configurations
+  ret = moat_object_get_int64_value(&config, const_cast<sse_char*>("port"), &port);
+  ASSERT(ret == SSE_E_OK);
+  port_ = static_cast<sse_int>(port);
+  LOG_DEBUG("Port number = [%d].", port_);
+
+  // Open socket for communicating with child process.
   sock_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
   ASSERT(sock_ != -1);
 
