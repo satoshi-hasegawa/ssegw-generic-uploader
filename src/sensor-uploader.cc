@@ -1,5 +1,6 @@
 #include <servicesync/moat.h>
 #include "external_process_sensor.h"
+#include "uploader.h"
 
 const sse_char MODEL_NAME_SENSED_DATA[] = "SensedData";
 
@@ -68,6 +69,9 @@ moat_app_main(sse_int in_argc, sse_char *argv[])
 
   {
     ExternalProcessSensor sensor(*config_sensor);
+    Uploader uploader;
+
+    sensor.addListener(&uploader);
     sensor.start();
 
     err = moat_run(moat);

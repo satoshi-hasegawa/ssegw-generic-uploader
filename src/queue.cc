@@ -81,7 +81,7 @@ MessageQueue::pushMessage(MoatObject* in_object)
 
   ASSERT(in_object);
 
-  if (capacity_ >= countMessage()) {
+  if (capacity_ <= countMessage()) {
     LOG_WARN("Message queue is full. (%d/%d)", countMessage(), capacity_);
     return SSE_E_AGAIN;
   }

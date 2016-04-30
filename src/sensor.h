@@ -30,8 +30,6 @@ class Sensor {
   virtual sse_int stop() { return SSE_E_OK; }
   virtual sse_int addListener(SensorListener* in_listener);
   virtual sse_int removeListener(SensorListener* in_listener);
-
- protected:
   virtual sse_int onEvent(MoatObject* in_event);
 
  protected:

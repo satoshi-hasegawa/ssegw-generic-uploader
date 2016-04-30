@@ -4,7 +4,7 @@
 #include <sseutils.h>
 #include "sensor.h"
 
-class ExternalProcessSensor {
+class ExternalProcessSensor : public Sensor {
  public:
   ExternalProcessSensor(MoatObject &config);
   virtual ~ExternalProcessSensor();

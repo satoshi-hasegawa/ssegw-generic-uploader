@@ -44,6 +44,7 @@ on_recv_data(MoatIOWatcher *in_watcher,
   sse_char buf[ExternalProcessSensor::RECV_BUFF_SIZE];
   sse_int recv_len;
   MoatObject* obj;
+  Sensor* self = static_cast<Sensor*>(in_user_data);
 
   sse_memset(buf, 0, sizeof(buf));
   recv_len = recvfrom(in_desc, buf, sizeof(buf) -1, 0, (struct sockaddr *)&si, &si_len);
@@ -59,6 +60,7 @@ on_recv_data(MoatIOWatcher *in_watcher,
     return;
   }
   MOAT_OBJECT_DUMP_INFO(TAG, obj);
+  self->onEvent(obj);
 
   return;
 }
@@ -104,7 +106,7 @@ ExternalProcessSensor::ExternalProcessSensor(MoatObject &config) : watcher_(NULL
   ret = bind(sock_, (struct sockaddr*)&si, sizeof(si));
   ASSERT(ret != -1);
 
-  watcher_ = moat_io_watcher_new(sock_, on_recv_data, NULL, MOAT_IO_FLAG_READ);
+  watcher_ = moat_io_watcher_new(sock_, on_recv_data, this, MOAT_IO_FLAG_READ);
   ASSERT(watcher_);
   ret = moat_io_watcher_start(watcher_);
   ASSERT(ret == SSE_E_OK);
