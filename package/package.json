@@ -20,7 +20,8 @@
       "array" : true,
       "scope" : "device",
       "attributes" : {
-        "timestamp" : {"type" : "int64"}
+        "value" { "type" : "string" },
+        "capturedAt" : {"type" : "int64"}
       }
     }
   }
