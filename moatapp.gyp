@@ -16,6 +16,7 @@
         'src/<(package_name).cc',
         'src/sensor.cc',
         'src/external_process_sensor.cc',
+        'src/queue.cc',
        ],
       'product_prefix': '',
       'type': 'shared_library',
