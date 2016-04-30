@@ -68,6 +68,7 @@ moat_app_main(sse_int in_argc, sse_char *argv[])
 
   {
     ExternalProcessSensor sensor(*config_sensor);
+    sensor.start();
 
     err = moat_run(moat);
     if (err != SSE_E_OK) {

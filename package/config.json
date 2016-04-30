@@ -1,5 +1,6 @@
 {
   "dummy_sensor": {
-    "port": 10999
+    "port": 10999,
+    "bin": "./sensor_monitor.sh"
   }
 }

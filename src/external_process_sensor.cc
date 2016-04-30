@@ -20,6 +20,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <servicesync/moat.h>
+#include <sseutils.h>
 #include "external_process_sensor.h"
 
 #define TAG "Uploader"
@@ -64,17 +65,33 @@ on_recv_data(MoatIOWatcher *in_watcher,
 
 ExternalProcessSensor::ExternalProcessSensor(MoatObject &config) : watcher_(NULL),
                                                                    sock_(-1),
-                                                                   port_(DEFAULT_PORT_NO)
+                                                                   port_(DEFAULT_PORT_NO),
+                                                                   command_path_(NULL)
 {
   sse_int ret;
   struct sockaddr_in si;
   sse_int64 port;
+  sse_char* bin_path;
+  sse_uint bin_path_len;
 
   // Load configurations
   ret = moat_object_get_int64_value(&config, const_cast<sse_char*>("port"), &port);
-  ASSERT(ret == SSE_E_OK);
-  port_ = static_cast<sse_int>(port);
+  if (ret != SSE_E_OK) {
+    LOG_WARN("moat_object_get_int64_value() failed with [%s].", sse_get_error_string(ret));
+    sse_double tmp;
+    ret = moat_object_get_double_value(&config, const_cast<sse_char*>("port"), &tmp);
+    ASSERT(ret == SSE_E_OK);
+    port_ = static_cast<sse_int>(tmp);
+  } else {
+    port_ = static_cast<sse_int>(port);
+  }
   LOG_DEBUG("Port number = [%d].", port_);
+
+  ret = moat_object_get_string_value(&config, const_cast<sse_char*>("bin"), &bin_path, &bin_path_len);
+  ASSERT(ret == SSE_E_OK);
+  command_path_ = sse_strndup(bin_path, bin_path_len);
+  LOG_DEBUG("Binary path = [%s].", command_path_);
+  
 
   // Open socket for communicating with child process.
   sock_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -98,3 +115,25 @@ ExternalProcessSensor::~ExternalProcessSensor()
   if (sock_ > -1) ::close(sock_);
   if (watcher_) moat_io_watcher_free(watcher_);
 }
+
+sse_int
+ExternalProcessSensor::start()
+{
+  sse_char port[32];
+
+  LOG_INFO("Starting [%s]", command_path_);
+  command_.SetCommand(command_path_);
+  command_.AddArgument("-p");
+  sse_itoa(port_, port);
+  command_.AddArgument(port);
+  command_.Execute();
+  return SSE_E_OK;
+}
+
+sse_int
+ExternalProcessSensor::stop()
+{
+  //FIXME
+  return SSE_E_OK;
+}
+

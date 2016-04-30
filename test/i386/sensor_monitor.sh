@@ -1,0 +1,1 @@
+../../package/sensor_monitor.sh
