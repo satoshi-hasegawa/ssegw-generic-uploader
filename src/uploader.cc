@@ -57,6 +57,7 @@ sse_int
 Uploader::upload()
 {
   sse_int err;
+  sse_int id;
   MoatObject* messages;
   MoatObject* collection;
   MoatObjectIterator* it;
@@ -107,18 +108,18 @@ Uploader::upload()
                                                         const_cast<sse_char*>("1.0.0"));
   ASSERT(urn);
 
-  err = moat_send_notification(moat_,
-                               urn,
-                               NULL,
-                               const_cast<sse_char*>("SensedData"),
-                               collection, 
-                               Uploader::uploadResultProc,
-                               this);
+  id = moat_send_notification(moat_,
+                              urn,
+                              NULL,
+                              const_cast<sse_char*>("SensedData"),
+                              collection, 
+                              Uploader::uploadResultProc,
+                              this);
   sse_free(urn);
   moat_object_free(collection);
-  if (err != SSE_E_OK) {
-    LOG_ERROR("moat_send_notification() failed with [%s].", sse_get_error_string(err));
-    return err;
+  if (id < 0) {
+    LOG_ERROR("moat_send_notification() failed.");
+    return SSE_E_GENERIC;
   }
 
   return SSE_E_OK;
