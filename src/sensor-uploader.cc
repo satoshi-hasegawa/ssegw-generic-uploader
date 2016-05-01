@@ -1,6 +1,6 @@
 #include <servicesync/moat.h>
 #include "external_process_sensor.h"
-#include "uploader.h"
+#include "periodic_uploader.h"
 
 const sse_char MODEL_NAME_SENSED_DATA[] = "SensedData";
 
@@ -26,6 +26,7 @@ moat_app_main(sse_int in_argc, sse_char *argv[])
   ModelMapper mapper;
   MoatObject* config;
   MoatObject* config_sensor;
+  MoatObject* config_uploader;
   const sse_char* config_file_path = "config.json";
 
   err = moat_init(argv[0], &moat);
@@ -51,6 +52,14 @@ moat_app_main(sse_int in_argc, sse_char *argv[])
     goto error_exit;
   }
 
+  err = moat_object_get_object_value(config,
+                                     const_cast<sse_char*>("uploader"),
+                                     &config_uploader);
+  if (err != SSE_E_OK) {
+    LOG_ERROR("Configuration for uploader was not found.");
+    goto error_exit;
+  }
+
 
   /* setup event handlers, timers, etc */
   /* register models */
@@ -69,7 +78,7 @@ moat_app_main(sse_int in_argc, sse_char *argv[])
 
   {
     ExternalProcessSensor sensor(*config_sensor);
-    Uploader uploader;
+    PeriodicUploader uploader(moat, *config_uploader);
 
     sensor.addListener(&uploader);
     sensor.start();

@@ -18,6 +18,7 @@
         'src/external_process_sensor.cc',
         'src/queue.cc',
         'src/uploader.cc',
+        'src/periodic_uploader.cc',
        ],
       'product_prefix': '',
       'type': 'shared_library',

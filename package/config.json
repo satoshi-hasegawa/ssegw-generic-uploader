@@ -2,5 +2,8 @@
   "dummy_sensor": {
     "port": 10999,
     "bin": "./sensor_monitor.sh"
+  },
+  "uploader": {
+    "interval": 10
   }
 }

@@ -24,11 +24,11 @@ class MessageQueue;
 
 class Uploader : public SensorListener {
  public:
-  Uploader();
+  Uploader(Moat in_moat);
   virtual ~Uploader();
   virtual sse_int callback(MoatObject* in_event);
   virtual sse_int upload();
-  virtual void onComplete();
+  virtual void onComplete(sse_int in_result);
   static void uploadResultProc(Moat in_moat,
                                sse_char *in_urn,
                                sse_char *in_model_name,
@@ -38,6 +38,7 @@ class Uploader : public SensorListener {
   sse_uint getMaxUplodingMessages() const { return max_uploading_messages_; }
 
  private:
+  Moat moat_;
   MessageQueue* queue_;
   MoatObject* uploading_;
   sse_uint max_uploading_messages_;
