@@ -16,6 +16,8 @@ done
 
 while true;
 do
-    echo "{ \"value\": ` od -A n -t u4 -N 1 /dev/urandom | sed 's/[^0-9]//g'` }" | nc -u -w 3 localhost $PORT
+    TEMPERATURE=` od -A n -t u4 -N 1 /dev/urandom | sed 's/[^0-9]//g'`
+    HUMANITY=` od -A n -t u4 -N 1 /dev/urandom | sed 's/[^0-9]//g'`
+    echo "{ \"temperature\": $TEMPERATURE, \"humanity\": $HUMANITY }" | nc -u -w 3 localhost $PORT
 done
 
