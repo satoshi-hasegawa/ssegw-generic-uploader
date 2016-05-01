@@ -75,11 +75,22 @@ PeriodicUploader::onTimerExpired(sse_int in_timer_id, sse_pointer in_user_data)
   PeriodicUploader* self = static_cast<PeriodicUploader*>(in_user_data);
   ASSERT(self);
 
-  //FIXME
-  //return sse_false;
+
 
   LOG_INFO("Timer has been expired.");
   self->upload();
-  return sse_true;
+  return sse_false;
 }
 
+void
+PeriodicUploader::onComplete(sse_int in_result)
+{
+  LOG_INFO("in_result = [%d].", in_result);
+  Uploader::onComplete(in_result);
+  timer_id_ = moat_timer_set(timer_,
+                             interval_,
+                             PeriodicUploader::onTimerExpired,
+                             this);
+  ASSERT(timer_id_ > 0);
+  LOG_INFO("Restart timer.");
+}

@@ -27,6 +27,7 @@ class PeriodicUploader : public Uploader {
   virtual ~PeriodicUploader();
   const sse_uint getInterval() const { return interval_; }
   void setInterval(sse_uint in_interval) { interval_ = in_interval; }
+  virtual void onComplete(sse_int in_result);
   static sse_bool onTimerExpired(sse_int in_timer_id, sse_pointer in_user_data);
 
  private:
